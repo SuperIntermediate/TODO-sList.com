@@ -36,8 +36,8 @@
                 <a class="nav-link disabled" aria-disabled="false">Contact us</a>
               </li>
             </ul>
-            <form class="d-flex" role="search">
-              <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+            <form id="search-form" class="d-flex" role="search">
+              <input id="search-input" class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
               <button class="btn btn-outline-success" type="submit">Search</button>
             </form>
           </div>
@@ -116,10 +116,10 @@
         
   
         // populate the Table
-        function update(){
+        function update( filteredItems = null){
         let tablebody = document.getElementById("tablebody");
         let str = "";
-        let itemJsonArray = JSON.parse(localStorage.getItem("itemsJson")) ||[];
+        let itemJsonArray = filteredItems|| JSON.parse(localStorage.getItem("itemsJson")) ||[];
         itemJsonArray.forEach((element, index) => {
           str += `
                       <tr>
@@ -135,6 +135,7 @@
         add = document.getElementById("add");
         add.addEventListener("click", getAndUpdate);
       update();
+
         function deleted(itemIndex){
           console.log("Deleted", itemIndex);
           itemJsonArrayStr = localStorage.getItem('itemsJson');
@@ -148,7 +149,28 @@
           console.log("Cleared Storage");
           localStorage.clear();
           update();
-        }}
+        }
+
+      }
+      let searchInput = document.getElementById("search-input");
+      let searchForm = document.getElementById("search-form");
+
+      searchForm.addEventListener("submit", function(event) {
+        event.preventDefault(); // Prevent page refresh
+
+        let query = searchInput.value.toLowerCase();
+
+        // Get the items from localStorage
+        let itemJsonArray = JSON.parse(localStorage.getItem("itemsJson")) || [];
+
+        // Filter the items based on the search query
+        let filteredItems = itemJsonArray.filter(item => {
+          return item[0].toLowerCase().includes(query) || item[1].toLowerCase().includes(query);
+        });
+
+        // Update the table with filtered items
+        update(filteredItems);
+      });
       </script>
 
     <script async src="https://cdn.jsdelivr.net/npm/es-module-shims@1/dist/es-module-shims.min.js" crossorigin="anonymous"></script>
